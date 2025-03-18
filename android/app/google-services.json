@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1017461831281",
+    "project_id": "clean-safi-60360",
+    "storage_bucket": "clean-safi-60360.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017461831281:android:e43b44c9f809e3c5b08dd0",
+        "android_client_info": {
+          "package_name": "com.example.cleansafi"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf0M_meR3uYDOFdvMouNBEhUCadS6pygg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1017461831281:android:dc86a075f4b52276b08dd0",
+        "android_client_info": {
+          "package_name": "com.murimi.onspace"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDf0M_meR3uYDOFdvMouNBEhUCadS6pygg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
