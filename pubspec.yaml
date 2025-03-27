@@ -21,6 +21,8 @@ dependencies:
   firebase_auth: ^5.5.1
   image_picker: ^1.1.2
   another_flushbar: ^1.12.30
+  url_launcher: ^6.3.1
+  flutter_svg: ^2.0.17
 
 dev_dependencies:
   flutter_test:
