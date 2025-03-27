@@ -26,7 +26,7 @@ class _CleanersPageState extends State<CleanersPage> {
       );
       return userCredential.user; // Successfully registered
     } on FirebaseAuthException catch (e) {
-      print("Error: ${e.message}");
+      debugPrint("Error: ${e.message}");
       return null;
     }
   }
