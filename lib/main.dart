@@ -1,5 +1,4 @@
 import 'package:cleansafi/color_pallette.dart';
-import 'package:cleansafi/connection_test.dart';
 import 'package:cleansafi/sign_in.dart';
 import 'package:cleansafi/sign_up.dart';
 import 'package:firebase_core/firebase_core.dart';
@@ -8,7 +7,6 @@ import 'package:flutter/material.dart';
 void main() async {
   runApp(const MyApp());
   await Firebase.initializeApp();
-  checkFirebase();
 }
 
 class MyApp extends StatelessWidget {
