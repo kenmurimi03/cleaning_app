@@ -2,7 +2,10 @@ import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/indoors_review.dart';
 import 'package:cleansafi/one_time.dart';
 import 'package:cleansafi/recurrent.dart';
+import 'package:cleansafi/services_offered.dart';
+import 'package:cleansafi/you_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class ServicesPage extends StatefulWidget {
   const ServicesPage({
@@ -41,26 +44,28 @@ class _ServicesPageState extends State<ServicesPage> {
         ),
       );
       return;
-    } else{
+    } else {
       if (mounted) {
         showDialog<void>(
-                        context: context,
-                        builder: (BuildContext context) {
-                          return Dialog(
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(10),
-                            ),
-                            elevation: 2,
-                            backgroundColor: AppTheme.kBackgroundColor,
-                            child: UserDetailsScreen(
-                              location: location,
-                               house: house, 
-                               phoneNumber: phoneNumber,
-                                customerName: customerName,
-                              ),
-                          );
-                        },
-                      );
+          context: context,
+          builder: (BuildContext context) {
+            return Dialog(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              elevation: 2,
+              backgroundColor: AppTheme.kBackgroundColor,
+              child: UserDetailsScreen(
+                location: location,
+                house: house,
+                phoneNumber: phoneNumber,
+                customerName: customerName,
+                selectedBedroom: selectedBedroomNotifier.value,
+                selectedBathroom: selectedBathroomNotifier.value,
+              ),
+            );
+          },
+        );
       }
     }
   }
@@ -69,7 +74,8 @@ class _ServicesPageState extends State<ServicesPage> {
   void initState() {
     super.initState();
   }
-   @override
+
+  @override
   void dispose() {
     _locationController.dispose();
     _houseController.dispose();
@@ -77,8 +83,6 @@ class _ServicesPageState extends State<ServicesPage> {
     _customerNameController.dispose();
     super.dispose();
   }
-
-  void filterForm() {}
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +291,7 @@ class _ServicesPageState extends State<ServicesPage> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Who should our cleaner contact?',
+                        'The phone number our cleaner is to contact',
                         style: TextStyle(
                           fontSize: 14,
                           fontStyle: FontStyle.normal,
@@ -803,35 +807,124 @@ class _ServicesPageState extends State<ServicesPage> {
                   const SizedBox(
                     height: 5,
                   ),
-
                 ],
               ),
             ),
-             Padding(
-            padding: const EdgeInsets.all(8),
-            child: MaterialButton(
-              color: AppTheme.pickerColor3,
-              minWidth: double.infinity,
-              height: 36,
-              elevation: 3,
-              onPressed: _registerUser,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'Save details and review specifics',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontStyle: FontStyle.normal,
-                  color: AppTheme.kBackgroundColor,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Helvetica Neue',
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: MaterialButton(
+                color: AppTheme.pickerColor3,
+                minWidth: double.infinity,
+                height: 36,
+                elevation: 3,
+                onPressed: _registerUser,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'Save details and review specifics',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.normal,
+                    color: AppTheme.kBackgroundColor,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Helvetica Neue',
+                  ),
                 ),
               ),
             ),
-          ),
           ],
         ),
+      ),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: currentIndexNotifier,
+        builder: (context, currentIndex, _) {
+          return BottomNavigationBar(
+            selectedIconTheme: const IconThemeData(
+              color: AppTheme.kBlackColor,
+            ),
+            selectedItemColor: Colors.black,
+            backgroundColor: AppTheme.kBackgroundColor,
+            currentIndex: currentIndex,
+            unselectedLabelStyle: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Helvetica Neue',
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+            selectedLabelStyle: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Helvetica Neue',
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+            onTap: (int index) {
+              currentIndexNotifier.value = index;
+            },
+            type: BottomNavigationBarType.fixed,
+            items: [
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      child: SvgPicture.asset(
+                        currentIndex == 0
+                            ? 'assets/active_home_tab_icon.svg'
+                            : 'assets/inactive_home_tab_icon.svg',
+                      ),
+                    ),
+                  ),
+                ),
+                label: 'home',
+              ),
+              const BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 4),
+                  child: SizedBox.shrink(),
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => YouPage()),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      child: SvgPicture.asset(
+                        currentIndex == 3
+                            ? 'assets/active_you_tab_icon.svg'
+                            : 'assets/inactive_you_tab_icon.svg',
+                      ),
+                    ),
+                  ),
+                ),
+                label: 'you',
+              ),
+            ],
+          );
+        },
       ),
     );
   }

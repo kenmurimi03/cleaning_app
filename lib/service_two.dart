@@ -2,7 +2,10 @@ import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/indoors_review.dart';
 import 'package:cleansafi/one_time.dart';
 import 'package:cleansafi/recurrent.dart';
+import 'package:cleansafi/services_offered.dart';
+import 'package:cleansafi/you_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class ServicestwoPage extends StatefulWidget {
   const ServicestwoPage({
@@ -14,7 +17,7 @@ class ServicestwoPage extends StatefulWidget {
 }
 
 class _ServicestwoPageState extends State<ServicestwoPage> {
-  final ValueNotifier<String> selectedBedroomNotifier =
+  final ValueNotifier<String> selectedLaundrySizeNotifier =
       ValueNotifier<String>('Select Laundry size');
 
   final currentIndexNotifier = ValueNotifier<int>(0);
@@ -56,6 +59,8 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
                 house: house,
                 phoneNumber: phoneNumber,
                 customerName: customerName,
+                laundrySize: selectedLaundrySizeNotifier.value,
+
               ),
             );
           },
@@ -77,8 +82,6 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
     _customerNameController.dispose();
     super.dispose();
   }
-
-  void filterForm() {}
 
   @override
   Widget build(BuildContext context) {
@@ -287,7 +290,7 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
                     child: Align(
                       alignment: Alignment.centerLeft,
                       child: Text(
-                        'Who should our cleaner contact?',
+                        'The phone number our cleaner is to contact',
                         style: TextStyle(
                           fontSize: 14,
                           fontStyle: FontStyle.normal,
@@ -479,161 +482,64 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
                         width: 15,
                       ),
                       Padding(
-                        padding: const EdgeInsets.only(left: 6),
-                        child: Align(
-                          alignment: Alignment.centerLeft,
-                          child: ValueListenableBuilder<String>(
-                            valueListenable: selectedBedroomNotifier,
-                            builder: (
-                              BuildContext context,
-                              String selectedValue,
-                              Widget? child,
-                            ) {
-                              return PopupMenuButton<String>(
-                                onSelected: (newValue) {
-                                  selectedBedroomNotifier.value = newValue;
-                                },
-                                surfaceTintColor: AppTheme.kBackgroundColor,
-                                tooltip: 'Choose section',
-                                offset: const Offset(30, -5),
-                                splashRadius: 0.1,
-                                constraints: const BoxConstraints(
-                                  minWidth: 81,
-                                  minHeight: 50,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 15, vertical: 8),
+                        child: ValueListenableBuilder<String>(
+                          valueListenable: selectedLaundrySizeNotifier,
+                          builder: (context, selectedValue, _) {
+                            return GestureDetector(
+                              onTap: () {
+                                PopupMenuItem<String> buildMenuItem(
+                                    String value) {
+                                  return PopupMenuItem(
+                                    value: value,
+                                    height: 35,
+                                    child: Text(
+                                      value,
+                                      style: const TextStyle(
+                                        fontSize: 14,
+                                        fontWeight: FontWeight.w700,
+                                        color: AppTheme.kBlackColor,
+                                        fontFamily: 'Helvetica Neue',
+                                      ),
+                                    ),
+                                  );
+                                }
+
+                                // Open the popup menu manually
+                                showMenu<String>(
+                                  context: context,
+                                  position: const RelativeRect.fromLTRB(
+                                      100, 300, 100, 100),
+                                  items: [
+                                    buildMenuItem('2 bags(20 items)'),
+                                    buildMenuItem('4 bags(40 items)'),
+                                    buildMenuItem('6 bags(60 items)'),
+                                    buildMenuItem('8 bags(80 items)'),
+                                    buildMenuItem('10 bags(100 items)'),
+                                    buildMenuItem('above 10 bags'),
+                                  ],
+                                ).then((value) {
+                                  if (value != null) {
+                                    selectedLaundrySizeNotifier.value = value;
+                                  }
+                                });
+                              },
+                              child: AbsorbPointer(
+                                child: TextFormField(
+                                  readOnly: true,
+                                  decoration: InputDecoration(
+                                    labelText: '',
+                                    border: const OutlineInputBorder(),
+                                    suffixIcon:
+                                        const Icon(Icons.keyboard_arrow_down),
+                                  ),
+                                  controller: TextEditingController(
+                                      text: selectedValue),
                                 ),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(2),
-                                ),
-                                itemBuilder: (context) => [
-                                  const PopupMenuItem(
-                                    value: '2 bags(20 items)',
-                                    height: 20,
-                                    child: Text(
-                                      '2 bags(20 items)',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppTheme.kBlackColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Helvetica Neue',
-                                      ),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: '4 bags(40 items)',
-                                    height: 20,
-                                    child: Text(
-                                      '4 bags(40 items)',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppTheme.kBlackColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Helvetica Neue',
-                                      ),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: '6 bags(60 items)',
-                                    height: 20,
-                                    child: Text(
-                                      '6 bags(60 items)',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppTheme.kBlackColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Helvetica Neue',
-                                      ),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: '8 bags(80 items)',
-                                    height: 20,
-                                    child: Text(
-                                      '8 bags(80 items)',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppTheme.kBlackColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Helvetica Neue',
-                                      ),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: '10 bags(100 items)',
-                                    height: 20,
-                                    child: Text(
-                                      '10 bags(100 items)',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppTheme.kBlackColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Helvetica Neue',
-                                      ),
-                                    ),
-                                  ),
-                                  const PopupMenuItem(
-                                    value: 'above 10 bags',
-                                    height: 20,
-                                    child: Text(
-                                      'above 10 bags',
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                        fontStyle: FontStyle.normal,
-                                        color: AppTheme.kBlackColor,
-                                        fontWeight: FontWeight.w700,
-                                        fontFamily: 'Helvetica Neue',
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                                elevation: 2,
-                                padding: EdgeInsets.zero,
-                                position: PopupMenuPosition.under,
-                                child: IgnorePointer(
-                                  child: Container(
-                                    decoration: BoxDecoration(
-                                      border: Border.all(
-                                        color: AppTheme.kBackgroundColor,
-                                      ),
-                                      color: AppTheme.kBackgroundColor,
-                                      borderRadius: BorderRadius.circular(4),
-                                    ),
-                                    child: Padding(
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 8,
-                                        vertical: 8,
-                                      ),
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            selectedBedroomNotifier.value,
-                                            style: const TextStyle(
-                                              fontSize: 14,
-                                              fontStyle: FontStyle.normal,
-                                              color: AppTheme.kBlackColor,
-                                              fontWeight: FontWeight.w700,
-                                              fontFamily: 'Helvetica Neue',
-                                            ),
-                                          ),
-                                          const Icon(
-                                            Icons.keyboard_arrow_down,
-                                            size: 18,
-                                            color: AppTheme.kBlackColor,
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                              ),
+                            );
+                          },
                         ),
                       ),
                     ],
@@ -678,30 +584,120 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
               ),
             ),
             Padding(
-            padding: const EdgeInsets.all(8),
-            child: MaterialButton(
-              color: AppTheme.pickerColor3,
-              minWidth: double.infinity,
-              height: 36,
-              elevation: 3,
-              onPressed: _registerUser,
-              shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(4),
-              ),
-              child: const Text(
-                'Save details and review specifics',
-                style: TextStyle(
-                  fontSize: 14,
-                  fontStyle: FontStyle.normal,
-                  color: AppTheme.kBackgroundColor,
-                  fontWeight: FontWeight.w700,
-                  fontFamily: 'Helvetica Neue',
+              padding: const EdgeInsets.all(8),
+              child: MaterialButton(
+                color: AppTheme.pickerColor3,
+                minWidth: double.infinity,
+                height: 36,
+                elevation: 3,
+                onPressed: _registerUser,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'Save details and review specifics',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.normal,
+                    color: AppTheme.kBackgroundColor,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Helvetica Neue',
+                  ),
                 ),
               ),
             ),
-          ),
           ],
         ),
+      ),
+      bottomNavigationBar: ValueListenableBuilder(
+        valueListenable: currentIndexNotifier,
+        builder: (context, currentIndex, _) {
+          return BottomNavigationBar(
+            selectedIconTheme: const IconThemeData(
+              color: AppTheme.kBlackColor,
+            ),
+            selectedItemColor: Colors.black,
+            backgroundColor: AppTheme.kBackgroundColor,
+            currentIndex: currentIndex,
+            unselectedLabelStyle: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Helvetica Neue',
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+            selectedLabelStyle: const TextStyle(
+              color: Colors.black,
+              fontFamily: 'Helvetica Neue',
+              fontSize: 11,
+              fontWeight: FontWeight.w700,
+            ),
+            onTap: (int index) {
+              currentIndexNotifier.value = index;
+            },
+            type: BottomNavigationBarType.fixed,
+            items: [
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => HomePage()),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      child: SvgPicture.asset(
+                        currentIndex == 0
+                            ? 'assets/active_home_tab_icon.svg'
+                            : 'assets/inactive_home_tab_icon.svg',
+                      ),
+                    ),
+                  ),
+                ),
+                label: 'home',
+              ),
+              const BottomNavigationBarItem(
+                icon: Padding(
+                  padding: EdgeInsets.only(bottom: 4),
+                  child: SizedBox.shrink(),
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: Padding(
+                  padding: const EdgeInsets.only(bottom: 4),
+                ),
+                label: '',
+              ),
+              BottomNavigationBarItem(
+                icon: GestureDetector(
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => YouPage()),
+                    );
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: SizedBox(
+                      height: 25,
+                      width: 25,
+                      child: SvgPicture.asset(
+                        currentIndex == 3
+                            ? 'assets/active_you_tab_icon.svg'
+                            : 'assets/inactive_you_tab_icon.svg',
+                      ),
+                    ),
+                  ),
+                ),
+                label: 'you',
+              ),
+            ],
+          );
+        },
       ),
     );
   }
