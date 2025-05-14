@@ -1,5 +1,6 @@
 import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/get_started.dart';
+import 'package:cleansafi/profile_dialog.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter_svg/flutter_svg.dart';
@@ -51,11 +52,6 @@ class _YouPageState extends State<YouPage> {
   }
 
   String? userEmail = FirebaseAuth.instance.currentUser?.email;
-// User? user = FirebaseAuth.instance.currentUser;
-// String initials = user != null && user.email != null
-//     ? getEmailInitials(user.email!)
-//     : "";
-// print("Initials: $initials");
 
   @override
   Widget build(BuildContext context) {
@@ -187,19 +183,11 @@ class _YouPageState extends State<YouPage> {
                 builder: (BuildContext context) {
                   return Dialog(
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(
-                        40,
-                      ), // Circular border
+                      borderRadius: BorderRadius.circular(10),
                     ),
                     elevation: 2,
                     backgroundColor: AppTheme.kBackgroundColor,
-                    child: SizedBox(
-                      width: MediaQuery.of(context).size.width *
-                          0.8, // 80% of screen width
-                      height: MediaQuery.of(context).size.height *
-                          0.5, // 50% of screen height
-                      // child: const MobileProfileePage(),
-                    ),
+                    child: ProfileDialog(),
                   );
                 },
               );
@@ -305,11 +293,11 @@ class _YouPageState extends State<YouPage> {
               height: 20,
               width: 20,
               child: SvgPicture.asset(
-                'assets/gift_box.svg',
+                'assets/support.svg',
               ),
             ),
             title: const Text(
-              'Feature Request',
+              'Contact support',
               style: TextStyle(
                 fontSize: 14,
                 fontWeight: FontWeight.w600,
@@ -317,7 +305,7 @@ class _YouPageState extends State<YouPage> {
               ),
             ),
             subtitle: const Text(
-              'Suggest a feature to be added into the system',
+              'You can talk to us incase of any query or issue',
               style: TextStyle(
                 fontFamily: 'Helvetica Neue',
                 fontSize: 12,
