@@ -3,7 +3,9 @@ import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/service_one.dart';
 import 'package:cleansafi/service_three.dart';
 import 'package:cleansafi/service_two.dart';
+import 'package:cleansafi/you_page.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/svg.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key, this.currentIndex});
@@ -240,6 +242,97 @@ class _HomePageState extends State<HomePage> {
                 ),
               ],
             ),
+          ),
+          bottomNavigationBar: ValueListenableBuilder(
+            valueListenable: currentIndexNotifier,
+            builder: (context, currentIndex, _) {
+              return BottomNavigationBar(
+                selectedIconTheme: const IconThemeData(
+                  color: AppTheme.kBlackColor,
+                ),
+                selectedItemColor: Colors.black,
+                backgroundColor: AppTheme.kBackgroundColor,
+                currentIndex: currentIndex,
+                unselectedLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Helvetica Neue',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+                selectedLabelStyle: const TextStyle(
+                  color: Colors.black,
+                  fontFamily: 'Helvetica Neue',
+                  fontSize: 11,
+                  fontWeight: FontWeight.w700,
+                ),
+                onTap: (int index) {
+                  currentIndexNotifier.value = index;
+                },
+                type: BottomNavigationBarType.fixed,
+                items: [
+                  BottomNavigationBarItem(
+                    icon: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                              builder: (context) => HomePage()),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: SvgPicture.asset(
+                            currentIndex == 0
+                                ? 'assets/active_home_tab_icon.svg'
+                                : 'assets/inactive_home_tab_icon.svg',
+                          ),
+                        ),
+                      ),
+                    ),
+                    label: 'home',
+                  ),
+                  const BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: EdgeInsets.only(bottom: 4),
+                      child: SizedBox.shrink(),
+                    ),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                    ),
+                    label: '',
+                  ),
+                  BottomNavigationBarItem(
+                    icon: GestureDetector(
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => YouPage()),
+                        );
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.only(bottom: 4),
+                        child: SizedBox(
+                          height: 25,
+                          width: 25,
+                          child: SvgPicture.asset(
+                            currentIndex == 3
+                                ? 'assets/active_you_tab_icon.svg'
+                                : 'assets/inactive_you_tab_icon.svg',
+                          ),
+                        ),
+                      ),
+                    ),
+                    label: 'you',
+                  ),
+                ],
+              );
+            },
           ),
         );
       },
