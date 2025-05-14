@@ -3,6 +3,9 @@ import 'package:cleansafi/color_pallette.dart';
 import 'package:flutter/material.dart';
 
 class UserDetailsScreen extends StatelessWidget {
+  final String? selectedBedroom;
+  final String? selectedBathroom;
+  final String? laundrySize;
   final String location;
   final String house;
   final String phoneNumber;
@@ -10,6 +13,9 @@ class UserDetailsScreen extends StatelessWidget {
 
   const UserDetailsScreen({
     super.key,
+    this.selectedBedroom,
+    this.selectedBathroom,
+    this.laundrySize,
     required this.location,
     required this.house,
     required this.phoneNumber,
@@ -120,7 +126,37 @@ class UserDetailsScreen extends StatelessWidget {
               ),
             ],
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 10),
+
+          Row(
+            children: [
+              const Icon(Icons.house, color: Colors.green),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "House details: $selectedBedroom, $selectedBathroom",
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
+
+           Row(
+            children: [
+              const Icon(Icons.cleaning_services, color: Colors.blue),
+              const SizedBox(width: 10),
+              Expanded(
+                child: Text(
+                  "Laundry size: $laundrySize",
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w500),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 10),
 
           // Confirm Button
           Align(
@@ -136,9 +172,9 @@ class UserDetailsScreen extends StatelessWidget {
               ),
               onPressed: () {
                 Navigator.pushReplacement(
-            context,
-            MaterialPageRoute(builder: (context) => CleanersPage()),
-          );
+                  context,
+                  MaterialPageRoute(builder: (context) => CleanersPage()),
+                );
               },
               child: const Text(
                 "Confirm",
