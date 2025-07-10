@@ -1,4 +1,5 @@
 import 'package:cleansafi/sign_in.dart';
+import 'package:cleansafi/sign_in_cleaner.dart';
 import 'package:cleansafi/sign_up.dart';
 import 'package:flutter/material.dart';
 
@@ -120,6 +121,43 @@ class _GetStartedPageState extends State<GetStartedPage> {
               ),
             ),
             const SizedBox(height: 10),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: MaterialButton(
+                color: AppTheme.pickerColor3,
+                minWidth: double.infinity,
+                height: 36,
+                elevation: 3,
+                onPressed: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 2,
+                        backgroundColor: AppTheme.kBackgroundColor,
+                        child: SignInCleanerDialog(),
+                      );
+                    },
+                  );
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'sign in(cleaner)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.normal,
+                    color: AppTheme.kBackgroundColor,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Helvetica Neue',
+                  ),
+                ),
+              ),
+            ),
           ],
         ),
       ),

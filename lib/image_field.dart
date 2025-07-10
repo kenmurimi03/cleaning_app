@@ -3,7 +3,14 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 
 class ImageUploadField extends StatefulWidget {
-  const ImageUploadField({super.key});
+  final Function(File?)? onImageSelected; // Callback for when image is selected
+  final File? initialImage; // Optional initial image
+
+  const ImageUploadField({
+    super.key,
+    this.onImageSelected,
+    this.initialImage,
+  });
 
   @override
   ImageUploadFieldState createState() => ImageUploadFieldState();
@@ -13,15 +20,29 @@ class ImageUploadFieldState extends State<ImageUploadField> {
   File? _selectedImage;
   final ImagePicker _picker = ImagePicker();
 
+  @override
+  void initState() {
+    super.initState();
+    _selectedImage = widget.initialImage;
+  }
+
   Future<void> _pickImage(ImageSource source) async {
     final pickedFile = await _picker.pickImage(source: source);
     if (pickedFile != null) {
       setState(() {
         _selectedImage = File(pickedFile.path);
       });
+      // Notify parent about the new image
+      if (widget.onImageSelected != null) {
+        widget.onImageSelected!(_selectedImage);
+      }
     }
   }
 
+  // Add a method to get the current image
+  File? get selectedImage => _selectedImage;
+
+  // Rest of your existing code...
   void _showImagePickerOptions(BuildContext context) {
     showModalBottomSheet(
       context: context,
