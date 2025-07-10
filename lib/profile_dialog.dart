@@ -1,5 +1,6 @@
 import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/responsive_layout_builder.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -12,8 +13,8 @@ class ProfileDialog extends StatelessWidget {
       small: (_, __) => MobileProfileDialog(
         key: const Key('mobile_dialog'),
       ),
-      large: (_, __) => SizedBox.shrink(
-        key: const Key('web_dialog'),
+      large: (_, __) => const SizedBox.shrink(
+        key: Key('web_dialog'),
       ),
     );
   }
@@ -30,30 +31,53 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
-  //get user email function
-  void getUserEmail() {
-    User? user = FirebaseAuth.instance.currentUser;
+  String? userEmail;
+  String fullName = 'Loading...';
 
-    if (user != null) {
-      debugPrint("User Email: ${user.email}");
-    } else {
-      debugPrint("No user is signed in.");
+  @override
+  void initState() {
+    super.initState();
+    final user = FirebaseAuth.instance.currentUser;
+    userEmail = user?.email ?? 'user@mail.com';
+    getUserName();
+  }
+
+  Future<void> getUserName() async {
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user != null) {
+        final email = user.email ?? '';
+
+        final querySnapshot = await FirebaseFirestore.instance
+            .collection('SignedUp')
+            .where('email_address', isEqualTo: email)
+            .limit(1)
+            .get();
+
+        if (querySnapshot.docs.isNotEmpty) {
+          final doc = querySnapshot.docs.first.data();
+          final firstName = doc['first_name'] ?? '';
+          final lastName = doc['last_name'] ?? '';
+          setState(() {
+            fullName = '$firstName $lastName';
+          });
+        } else {
+          setState(() {
+            fullName = 'User not found';
+          });
+        }
+      } else {
+        setState(() {
+          fullName = 'No user logged in';
+        });
+      }
+    } catch (e) {
+      debugPrint('Error fetching user name: $e');
+      setState(() {
+        fullName = 'Error loading name';
+      });
     }
   }
-
-  // retrieve users' initial from email
-  String getEmailInitials(String email) {
-    if (email.isEmpty || !email.contains('@')) return '';
-
-    List<String> parts = email.split('@');
-    String username = parts[0]; // Before '@'
-
-    String firstInitial = username.isNotEmpty ? username[0].toUpperCase() : '';
-
-    return firstInitial;
-  }
-
-  String? userEmail = FirebaseAuth.instance.currentUser?.email;
 
   @override
   void dispose() {
@@ -73,13 +97,13 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
         insetPadding: const EdgeInsets.all(8),
         child: Container(
           width: screenWidth * 0.7,
-          height: screenWidth * 0.7, // Use initialized width
+          height: screenWidth * 0.7,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(15),
             color: AppTheme.kBackgroundColor,
           ),
-          constraints: BoxConstraints(
-            maxHeight: 600, // Restricts dialog height
+          constraints: const BoxConstraints(
+            maxHeight: 600,
           ),
           child: Column(
             mainAxisSize: MainAxisSize.min,
@@ -88,9 +112,7 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
                 mainAxisAlignment: MainAxisAlignment.end,
                 children: [
                   Padding(
-                    padding: const EdgeInsets.only(
-                        right:
-                            55), // Optional spacing between image and close icon
+                    padding: const EdgeInsets.only(right: 55),
                     child: Image.asset(
                       'assets/cleansafi.png',
                       height: 70,
@@ -98,9 +120,7 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
                     ),
                   ),
                   InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop<bool>(false);
-                    },
+                    onTap: () => Navigator.of(context).pop<bool>(false),
                     child: Padding(
                       padding: const EdgeInsets.all(10),
                       child: Container(
@@ -139,28 +159,24 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 5,
-              ),
+              const SizedBox(height: 5),
               SizedBox(
                 height: 30,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
                     userEmail ?? 'user@mail.com',
                     style: const TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.normal,
-                      color: AppTheme.kBlackColor,
+                      color: AppTheme.kSecondary2GreyColor,
                       fontWeight: FontWeight.w700,
                       fontFamily: 'Helvetica Neue',
                     ),
                   ),
                 ),
               ),
-              const SizedBox(
-                height: 15,
-              ),
+              const SizedBox(height: 15),
               const Padding(
                 padding: EdgeInsets.only(left: 12),
                 child: Align(
@@ -180,12 +196,12 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
               SizedBox(
                 height: 30,
                 child: Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12),
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
-                    getEmailInitials(userEmail!),
+                    fullName,
                     style: const TextStyle(
-                      fontWeight: FontWeight.w500,
-                      color: AppTheme.kBlackColor,
+                      fontWeight: FontWeight.w600,
+                      color: AppTheme.kSecondary2GreyColor,
                       fontSize: 14,
                     ),
                   ),
@@ -198,3 +214,4 @@ class _MobileProfileDialogState extends State<MobileProfileDialog> {
     );
   }
 }
+

@@ -3,6 +3,7 @@ import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/service_one.dart';
 import 'package:cleansafi/service_three.dart';
 import 'package:cleansafi/service_two.dart';
+import 'package:cleansafi/users_orders_made.dart';
 import 'package:cleansafi/you_page.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
@@ -266,65 +267,75 @@ class _HomePageState extends State<HomePage> {
                   fontWeight: FontWeight.w700,
                 ),
                 onTap: (int index) {
-                  currentIndexNotifier.value = index;
+                  setState(() {
+                    currentIndex = index;
+                  });
+
+                  // Handle navigation
+                  switch (index) {
+                    case 0:
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => HomePage()),
+                      );
+                      break;
+                    case 1:
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => UsersOrdersMade()),
+                      );
+                      break;
+                    case 2:
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(builder: (context) => YouPage()),
+                      );
+                      break;
+                  }
                 },
                 type: BottomNavigationBarType.fixed,
                 items: [
                   BottomNavigationBarItem(
-                    icon: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                              builder: (context) => HomePage()),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: SvgPicture.asset(
-                            currentIndex == 0
-                                ? 'assets/active_home_tab_icon.svg'
-                                : 'assets/inactive_home_tab_icon.svg',
-                          ),
+                    icon: Padding(
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: SizedBox(
+                        height: 25,
+                        width: 25,
+                        child: SvgPicture.asset(
+                          currentIndex == 0
+                              ? 'assets/active_home_tab_icon.svg'
+                              : 'assets/inactive_home_tab_icon.svg',
                         ),
                       ),
                     ),
                     label: 'home',
                   ),
-                  const BottomNavigationBarItem(
+                  BottomNavigationBarItem(
                     icon: Padding(
-                      padding: EdgeInsets.only(bottom: 4),
-                      child: SizedBox.shrink(),
+                      padding: const EdgeInsets.only(bottom: 4),
+                      child: SizedBox(
+                        height: 25,
+                        width: 25,
+                        child: SvgPicture.asset(
+                          currentIndex == 1
+                              ? 'assets/gift_box.svg'
+                              : 'assets/gift_box.svg',
+                        ),
+                      ),
                     ),
-                    label: '',
+                    label: 'Your orders',
                   ),
                   BottomNavigationBarItem(
                     icon: Padding(
                       padding: const EdgeInsets.only(bottom: 4),
-                    ),
-                    label: '',
-                  ),
-                  BottomNavigationBarItem(
-                    icon: GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => YouPage()),
-                        );
-                      },
-                      child: Padding(
-                        padding: const EdgeInsets.only(bottom: 4),
-                        child: SizedBox(
-                          height: 25,
-                          width: 25,
-                          child: SvgPicture.asset(
-                            currentIndex == 3
-                                ? 'assets/active_you_tab_icon.svg'
-                                : 'assets/inactive_you_tab_icon.svg',
-                          ),
+                      child: SizedBox(
+                        height: 25,
+                        width: 25,
+                        child: SvgPicture.asset(
+                          currentIndex == 2
+                              ? 'assets/active_you_tab_icon.svg'
+                              : 'assets/inactive_you_tab_icon.svg',
                         ),
                       ),
                     ),

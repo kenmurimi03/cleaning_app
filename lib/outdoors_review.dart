@@ -154,7 +154,13 @@ class UserrDetailsScreen extends StatelessWidget {
               onPressed: () {
                 Navigator.pushReplacement(
                   context,
-                  MaterialPageRoute(builder: (context) => CleanersPage()),
+                  MaterialPageRoute(
+                      builder: (context) => CleanersPage(
+                            location: location,
+                            house: house,
+                            phone: phoneNumber,
+                            name: customerName,
+                          )),
                 );
               },
               child: const Text(

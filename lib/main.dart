@@ -1,5 +1,6 @@
 import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/sign_in.dart';
+import 'package:cleansafi/sign_in_cleaner.dart';
 import 'package:cleansafi/sign_up.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
@@ -7,6 +8,7 @@ import 'package:flutter/material.dart';
 void main() async {
   runApp(const MyApp());
   await Firebase.initializeApp();
+  
 }
 
 class MyApp extends StatelessWidget {
@@ -141,14 +143,43 @@ class _GetStartedPageState extends State<GetStartedPage> {
                 ),
               ),
             ),
-
-            // PrimaryButton(
-            //   onPressed: () =>
-            //       GoRouter.of(context).push('${OnspaceRouter.signUp}/0'),
-            //   title: 'Sign Up with Email',
-            //   isGoogle: false,
-            //   disabled: false,
-            // ),
+            Padding(
+              padding: const EdgeInsets.all(8),
+              child: MaterialButton(
+                color: AppTheme.pickerColor3,
+                minWidth: double.infinity,
+                height: 36,
+                elevation: 3,
+                onPressed: () {
+                  showDialog<void>(
+                    context: context,
+                    builder: (BuildContext context) {
+                      return Dialog(
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: 2,
+                        backgroundColor: AppTheme.kBackgroundColor,
+                        child: SignInCleanerDialog(),
+                      );
+                    },
+                  );
+                },
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(4),
+                ),
+                child: const Text(
+                  'sign in (cleaner)',
+                  style: TextStyle(
+                    fontSize: 14,
+                    fontStyle: FontStyle.normal,
+                    color: AppTheme.kBackgroundColor,
+                    fontWeight: FontWeight.w700,
+                    fontFamily: 'Helvetica Neue',
+                  ),
+                ),
+              ),
+            ),
             const SizedBox(height: 10),
           ],
         ),

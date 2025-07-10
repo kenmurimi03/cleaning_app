@@ -1,11 +1,14 @@
-import 'package:cleansafi/cleaners_page.dart';
 import 'package:cleansafi/color_pallette.dart';
+import 'package:cleansafi/manually_choose_cleaner.dart';
+import 'package:cleansafi/sync_cleaner.dart';
 import 'package:flutter/material.dart';
 
 class UserDetailsScreen extends StatelessWidget {
   final String? selectedBedroom;
   final String? selectedBathroom;
   final String? laundrySize;
+  final int? totalAmount;
+
   final String location;
   final String house;
   final String phoneNumber;
@@ -15,6 +18,7 @@ class UserDetailsScreen extends StatelessWidget {
     super.key,
     this.selectedBedroom,
     this.selectedBathroom,
+    this.totalAmount,
     this.laundrySize,
     required this.location,
     required this.house,
@@ -143,13 +147,13 @@ class UserDetailsScreen extends StatelessWidget {
           ),
           const SizedBox(height: 10),
 
-           Row(
+          Row(
             children: [
-              const Icon(Icons.cleaning_services, color: Colors.blue),
+              const Icon(Icons.credit_card, color: Colors.blue),
               const SizedBox(width: 10),
               Expanded(
                 child: Text(
-                  "Laundry size: $laundrySize",
+                  "Amount payable: $totalAmount",
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.w500),
                 ),
@@ -159,31 +163,75 @@ class UserDetailsScreen extends StatelessWidget {
           const SizedBox(height: 10),
 
           // Confirm Button
-          Align(
-            alignment: Alignment.center,
-            child: ElevatedButton(
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Colors.blueAccent,
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(10),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: const Size.fromHeight(50), // ensure full-width
                 ),
-                padding:
-                    const EdgeInsets.symmetric(horizontal: 30, vertical: 12),
-              ),
-              onPressed: () {
-                Navigator.pushReplacement(
-                  context,
-                  MaterialPageRoute(builder: (context) => CleanersPage()),
-                );
-              },
-              child: const Text(
-                "Confirm",
-                style: TextStyle(
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) =>  SyncCleanerDialog(
+                      location: location,
+                      house: house,
+                      phone: phoneNumber,
+                      name: customerName,
+                      bedrooms: selectedBedroom,
+                      bathrooms: selectedBathroom,
+                      totalAmount: totalAmount,
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Sync cleaner",
+                  style: TextStyle(
                     fontSize: 16,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white),
+                    color: Colors.white,
+                  ),
+                ),
               ),
-            ),
+              const SizedBox(height: 16), // space between the buttons
+              ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.blueAccent,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  padding: const EdgeInsets.symmetric(vertical: 16),
+                  minimumSize: const Size.fromHeight(50),
+                ),
+                onPressed: () {
+                  showDialog(
+                    context: context,
+                    builder: (context) => ManuallyChooseCleanerDialog(
+                      location: location,
+                      house: house,
+                      phone: phoneNumber,
+                      name: customerName,
+                      bedrooms: selectedBedroom,
+                      bathrooms: selectedBathroom,
+                      totalAmount: totalAmount,
+                    ),
+                  );
+                },
+                child: const Text(
+                  "Choose cleaner",
+                  style: TextStyle(
+                    fontSize: 16,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ],
           ),
         ],
       ),

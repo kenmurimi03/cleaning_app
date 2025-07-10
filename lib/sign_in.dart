@@ -4,6 +4,7 @@ import 'package:cleansafi/services_offered.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:another_flushbar/flushbar.dart';
+import 'package:modal_progress_hud_nsn/modal_progress_hud_nsn.dart';
 
 class SignInDialog extends StatelessWidget {
   const SignInDialog({super.key});
@@ -31,8 +32,11 @@ class MobileSignInDialog extends StatefulWidget {
 class _MobileSignInDialogState extends State<MobileSignInDialog> {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  bool _isLoading = false; // Track loading state (step1)
 
   Future<void> _signInWithEmailAndPassword() async {
+    setState(() => _isLoading = true); // Start loading (step2) 
+
     try {
       // Get email and password from text fields
       String email = _emailController.text.trim();
@@ -190,6 +194,10 @@ class _MobileSignInDialogState extends State<MobileSignInDialog> {
           isDismissible: true,
           padding: const EdgeInsets.all(16),
         ).show(context);
+
+        if (mounted) {
+          setState(() => _isLoading = false); // Stop loading (step3)
+        }
       }
     }
   }
@@ -205,244 +213,253 @@ class _MobileSignInDialogState extends State<MobileSignInDialog> {
   Widget build(BuildContext context) {
     double screenWidth = MediaQuery.of(context).size.width;
 
-    return SizedBox(
-      height: 400,
-      child: Dialog(
-        backgroundColor: Colors.transparent,
-        insetPadding: const EdgeInsets.all(8),
-        child: Container(
-          width: screenWidth * 0.7,
-          height: screenWidth * 0.7, // Use initialized width
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(15),
-            color: AppTheme.kBackgroundColor,
-          ),
-          constraints: BoxConstraints(
-            maxHeight: 600, // Restricts dialog height
-          ),
-          child: Column(
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.end,
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.only(
-                        right:
-                            55), // Optional spacing between image and close icon
-                    child: Image.asset(
-                      'assets/cleansafi.png',
-                      height: 70,
-                      fit: BoxFit.contain,
+    return ModalProgressHUD(  
+      inAsyncCall: _isLoading, // Show spinner when true (step4)
+      opacity: 0.5,
+      progressIndicator: const CircularProgressIndicator(
+        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.pickerColor3),
+      ),
+      child: SizedBox(
+        height: 400,
+        child: Dialog(
+          backgroundColor: Colors.transparent,
+          insetPadding: const EdgeInsets.all(8),
+          child: Container(
+            width: screenWidth * 0.7,
+            height: screenWidth * 0.7, // Use initialized width
+            decoration: BoxDecoration(
+              borderRadius: BorderRadius.circular(15),
+              color: AppTheme.kBackgroundColor,
+            ),
+            constraints: BoxConstraints(
+              maxHeight: 600, // Restricts dialog height
+            ),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(
+                          right:
+                              55), // Optional spacing between image and close icon
+                      child: Image.asset(
+                        'assets/cleansafi.png',
+                        height: 70,
+                        fit: BoxFit.contain,
+                      ),
                     ),
-                  ),
-                  InkWell(
-                    onTap: () {
-                      Navigator.of(context).pop<bool>(false);
-                    },
-                    child: Padding(
-                      padding: const EdgeInsets.all(10),
-                      child: Container(
-                        height: 32,
-                        width: 32,
-                        decoration: BoxDecoration(
-                          color: AppTheme.kBackgroundColor,
-                          borderRadius: BorderRadius.circular(3),
-                        ),
-                        child: const Center(
-                          child: Icon(
-                            Icons.close,
-                            size: 22,
-                            color: AppTheme.kAccent22GreyColor,
+                    InkWell(
+                      onTap: () {
+                        Navigator.of(context).pop<bool>(false);
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.all(10),
+                        child: Container(
+                          height: 32,
+                          width: 32,
+                          decoration: BoxDecoration(
+                            color: AppTheme.kBackgroundColor,
+                            borderRadius: BorderRadius.circular(3),
+                          ),
+                          child: const Center(
+                            child: Icon(
+                              Icons.close,
+                              size: 22,
+                              color: AppTheme.kAccent22GreyColor,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                ],
-              ),
-              SizedBox(
-                width: screenWidth * .5, // Use safe screen width
-                child: Text(
-                  "Sign in",
-                  style: const TextStyle(
-                    fontSize: 14,
-                    fontStyle: FontStyle.normal,
-                    color: AppTheme.kBlackColor,
-                    fontWeight: FontWeight.w700,
-                    fontFamily: 'Helvetica Neue',
-                  ),
-                  textAlign: TextAlign.center,
+                  ],
                 ),
-              ),
-              const SizedBox(height: 15),
-              const Padding(
-                padding: EdgeInsets.only(left: 12),
-                child: Align(
-                  alignment: Alignment.centerLeft,
+                SizedBox(
+                  width: screenWidth * .5, // Use safe screen width
                   child: Text(
-                    'Email address:',
-                    style: TextStyle(
+                    "Sign in",
+                    style: const TextStyle(
                       fontSize: 14,
                       fontStyle: FontStyle.normal,
                       color: AppTheme.kBlackColor,
-                      fontWeight: FontWeight.w600,
+                      fontWeight: FontWeight.w700,
                       fontFamily: 'Helvetica Neue',
                     ),
+                    textAlign: TextAlign.center,
                   ),
                 ),
-              ),
-              const SizedBox(
-                height: 5,
-              ),
-              SizedBox(
-                height: 30,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12),
-                  child: TextFormField(
-                    controller: _emailController, // Add controller
-                    style: const TextStyle(
-                      fontFamily: 'Helvetica Neue',
-                      color: AppTheme.kBlackColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                        ),
-                      ),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                          width: 0.5,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                      ),
-                      fillColor: AppTheme.kBackgroundColor,
-                      hintStyle: TextStyle(
-                        fontFamily: 'Helvetica Neue',
-                        color: AppTheme.kDullGreyColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              const Padding(
-                padding: EdgeInsets.only(left: 12),
-                child: Align(
-                  alignment: Alignment.centerLeft,
-                  child: Text(
-                    'password:',
-                    style: TextStyle(
-                      fontSize: 14,
-                      fontStyle: FontStyle.normal,
-                      color: AppTheme.kBlackColor,
-                      fontWeight: FontWeight.w600,
-                      fontFamily: 'Helvetica Neue',
-                    ),
-                  ),
-                ),
-              ),
-              SizedBox(
-                height: 30,
-                child: Padding(
-                  padding: const EdgeInsets.only(left: 12, right: 12),
-                  child: TextFormField(
-                    controller: _passwordController, // Add controller
-                    obscureText: true, // Hide password
-                    style: const TextStyle(
-                      fontFamily: 'Helvetica Neue',
-                      color: AppTheme.kBlackColor,
-                      fontSize: 13,
-                      fontWeight: FontWeight.w500,
-                    ),
-                    decoration: InputDecoration(
-                      border: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                        ),
-                      ),
-                      enabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                        ),
-                      ),
-                      focusedBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                        ),
-                      ),
-                      disabledBorder: OutlineInputBorder(
-                        borderRadius: BorderRadius.circular(5),
-                        borderSide: const BorderSide(
-                          color: AppTheme.kSecondaryGreyColor,
-                          width: 0.5,
-                        ),
-                      ),
-                      contentPadding: const EdgeInsets.symmetric(
-                        horizontal: 30,
-                      ),
-                      fillColor: AppTheme.kBackgroundColor,
-                      hintStyle: TextStyle(
-                        fontFamily: 'Helvetica Neue',
-                        color: AppTheme.kDullGreyColor,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.all(8),
-                  child: MaterialButton(
-                    color: AppTheme.pickerColor3,
-                    minWidth: double.infinity,
-                    height: 36,
-                    elevation: 3,
-                    onPressed: _signInWithEmailAndPassword, // Call sign-in method
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      'Sign in',
+                const SizedBox(height: 15),
+                const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'Email address:',
                       style: TextStyle(
                         fontSize: 14,
                         fontStyle: FontStyle.normal,
-                        color: AppTheme.kBackgroundColor,
-                        fontWeight: FontWeight.w700,
+                        color: AppTheme.kBlackColor,
+                        fontWeight: FontWeight.w600,
                         fontFamily: 'Helvetica Neue',
                       ),
                     ),
                   ),
                 ),
-              ),
-            ],
+                const SizedBox(
+                  height: 5,
+                ),
+                SizedBox(
+                  height: 30,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: TextFormField(
+                      controller: _emailController, // Add controller
+                      style: const TextStyle(
+                        fontFamily: 'Helvetica Neue',
+                        color: AppTheme.kBlackColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                            width: 0.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                        ),
+                        fillColor: AppTheme.kBackgroundColor,
+                        hintStyle: TextStyle(
+                          fontFamily: 'Helvetica Neue',
+                          color: AppTheme.kDullGreyColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
+                      'password:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.normal,
+                        color: AppTheme.kBlackColor,
+                        fontWeight: FontWeight.w600,
+                        fontFamily: 'Helvetica Neue',
+                      ),
+                    ),
+                  ),
+                ),
+                SizedBox(
+                  height: 30,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: TextFormField(
+                      controller: _passwordController, // Add controller
+                      obscureText: true, // Hide password
+                      style: const TextStyle(
+                        fontFamily: 'Helvetica Neue',
+                        color: AppTheme.kBlackColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                            width: 0.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                        ),
+                        fillColor: AppTheme.kBackgroundColor,
+                        hintStyle: TextStyle(
+                          fontFamily: 'Helvetica Neue',
+                          color: AppTheme.kDullGreyColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: MaterialButton(
+                      color: AppTheme.pickerColor3,
+                      minWidth: double.infinity,
+                      height: 36,
+                      elevation: 3,
+                      onPressed: _isLoading
+                          ? null
+                          : _signInWithEmailAndPassword, // Disable button when loading (step5)
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(4),
+                      ),
+                      child: const Text(
+                        'Sign in',
+                        style: TextStyle(
+                          fontSize: 14,
+                          fontStyle: FontStyle.normal,
+                          color: AppTheme.kBackgroundColor,
+                          fontWeight: FontWeight.w700,
+                          fontFamily: 'Helvetica Neue',
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+              ],
+            ),
           ),
         ),
       ),

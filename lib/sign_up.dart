@@ -1,6 +1,7 @@
 import 'package:another_flushbar/flushbar.dart';
 import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -126,6 +127,15 @@ class _SignUpState extends State<SignUp> {
           },
         );
       }
+
+      await FirebaseFirestore.instance.collection('SignedUp').add({
+        'first_name': firstName,
+        'last_name': lastName,
+        'email_address': email,
+        
+        'createdAt': FieldValue.serverTimestamp(), //optional
+      });
+      
     } else {
       // Registration failed
       if (mounted) {
