@@ -4,6 +4,7 @@ import 'package:cleansafi/one_time.dart';
 import 'package:cleansafi/recurrent.dart';
 import 'package:cleansafi/services_offered.dart';
 import 'package:cleansafi/you_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -60,12 +61,42 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
                 phoneNumber: phoneNumber,
                 customerName: customerName,
                 laundrySize: selectedLaundrySizeNotifier.value,
-
               ),
             );
           },
         );
       }
+    }
+  }
+
+  // save laundry cleaning data into firebase database
+
+  void saveToFirestore() async {
+    final location2 = _locationController.text.trim();
+    final house2 = _houseController.text.trim();
+    final phone2 = _phoneNumberController.text.trim();
+    final name2 = _customerNameController.text.trim();
+    final laundrySize2 = selectedLaundrySizeNotifier.value;
+
+    try {
+      await FirebaseFirestore.instance.collection('laundryCleaning').add({
+        'location': location2,
+        'house': house2,
+        'phone': phone2,
+        'name': name2,
+        'laundry_size': laundrySize2,
+        'createdAt': FieldValue.serverTimestamp(), //optional
+      });
+
+      // Optional: clear the fields after saving
+      _locationController.clear();
+      _houseController.clear();
+      _phoneNumberController.clear();
+      _customerNameController.clear();
+
+      debugPrint('Data saved successfully!');
+    } catch (e) {
+      debugPrint('Failed to save data: $e');
     }
   }
 
@@ -590,7 +621,11 @@ class _ServicestwoPageState extends State<ServicestwoPage> {
                 minWidth: double.infinity,
                 height: 36,
                 elevation: 3,
-                onPressed: _registerUser,
+                onPressed: () async {
+                  saveToFirestore();
+
+                  _registerUser();
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),

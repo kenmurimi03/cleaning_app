@@ -4,6 +4,7 @@ import 'package:cleansafi/one_time.dart';
 import 'package:cleansafi/recurrent.dart';
 import 'package:cleansafi/services_offered.dart';
 import 'package:cleansafi/you_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/svg.dart';
 
@@ -21,6 +22,9 @@ class _ServicesPageState extends State<ServicesPage> {
       ValueNotifier<String>('Select bedroom no');
   final ValueNotifier<String> selectedBathroomNotifier =
       ValueNotifier<String>('Select bathroom no');
+
+  final totalAmountNotifier = ValueNotifier<int>(700);
+
   final currentIndexNotifier = ValueNotifier<int>(0);
   final _locationController = TextEditingController();
   final _houseController = TextEditingController();
@@ -62,11 +66,46 @@ class _ServicesPageState extends State<ServicesPage> {
                 customerName: customerName,
                 selectedBedroom: selectedBedroomNotifier.value,
                 selectedBathroom: selectedBathroomNotifier.value,
+                totalAmount: totalAmountNotifier.value,
               ),
             );
           },
         );
       }
+    }
+  }
+
+  // save indoor cleaning data into firebase database
+
+  void saveToFirestore() async {
+    final location1 = _locationController.text.trim();
+    final house1 = _houseController.text.trim();
+    final phone1 = _phoneNumberController.text.trim();
+    final name1 = _customerNameController.text.trim();
+    final selectedBedroom = selectedBedroomNotifier.value;
+    final selectedBathroom = selectedBathroomNotifier.value;
+final int totalAmount = totalAmountNotifier.value;
+    try {
+      await FirebaseFirestore.instance.collection('indoorCleaning').add({
+        'location': location1,
+        'house': house1,
+        'phone': phone1,
+        'name': name1,
+        'number_of_bedrooms': selectedBedroom,
+        'number_of_bathrooms': selectedBathroom,
+        'amount_payable': totalAmount,
+        'createdAt': FieldValue.serverTimestamp(), //optional
+      });
+
+      // Optional: clear the fields after saving
+      _locationController.clear();
+      _houseController.clear();
+      _phoneNumberController.clear();
+      _customerNameController.clear();
+
+      debugPrint('Data saved successfully!');
+    } catch (e) {
+      debugPrint('Failed to save data: $e');
     }
   }
 
@@ -498,6 +537,23 @@ class _ServicesPageState extends State<ServicesPage> {
                                   return PopupMenuButton<String>(
                                     onSelected: (newValue) {
                                       selectedBedroomNotifier.value = newValue;
+
+                                      int totalAmount =
+                                          700; // Base amount for 1 bedroom
+
+                                      if (newValue.contains('2')) {
+                                        totalAmount += 200; // 2 bedrooms
+                                      } else if (newValue.contains('3')) {
+                                        totalAmount += 400; // 3 bedrooms
+                                      } else if (newValue.contains('4')) {
+                                        totalAmount +=
+                                            600; // 4 bedrooms or more
+                                      }
+
+                                      totalAmountNotifier.value = totalAmount;
+
+                                      debugPrint(
+                                          'Total amount payable: $totalAmount');
                                     },
                                     surfaceTintColor: AppTheme.kBackgroundColor,
                                     tooltip: 'Choose section',
@@ -817,7 +873,11 @@ class _ServicesPageState extends State<ServicesPage> {
                 minWidth: double.infinity,
                 height: 36,
                 elevation: 3,
-                onPressed: _registerUser,
+                onPressed: () async {
+                  saveToFirestore();
+
+                  _registerUser();
+                },
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(4),
                 ),
