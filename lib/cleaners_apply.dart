@@ -1,6 +1,10 @@
+import 'dart:io';
+
 import 'package:cleansafi/color_pallette.dart';
 import 'package:cleansafi/image_field.dart';
-import 'package:cleansafi/sign_in.dart';
+import 'package:cleansafi/sign_in_cleaner.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_storage/firebase_storage.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
@@ -18,6 +22,9 @@ class _CleanersApplyState extends State<CleanersApply> {
   final _passwordController = TextEditingController();
   final _firstNameController = TextEditingController();
   final _lastNameController = TextEditingController();
+  final _photoURLController = TextEditingController();
+  final _ageController = TextEditingController();
+  File? selectedImage; // Store the selected image here
 
   Future<User?> registerWithEmailPassword(String email, String password) async {
     try {
@@ -33,27 +40,45 @@ class _CleanersApplyState extends State<CleanersApply> {
     }
   }
 
+  Future<String?> uploadImage(File imageFile) async {
+    try {
+      String fileName = DateTime.now().millisecondsSinceEpoch.toString();
+      Reference storageReference =
+          FirebaseStorage.instance.ref().child('cleaner_images/$fileName');
+      UploadTask uploadTask = storageReference.putFile(imageFile);
+      TaskSnapshot storageTaskSnapshot = await uploadTask;
+      String downloadUrl = await storageTaskSnapshot.ref.getDownloadURL();
+      return downloadUrl;
+    } catch (e) {
+      debugPrint("Error uploading image: $e");
+      return null;
+    }
+  }
+
   void _registerUser() async {
     String email = _emailController.text.trim();
     String password = _passwordController.text.trim();
     String firstName = _firstNameController.text.trim();
     String lastName = _lastNameController.text.trim();
+    String age = _ageController.text.trim();
+    String photoURL = _photoURLController.text.trim();
 
     if (email.isEmpty ||
         password.isEmpty ||
         firstName.isEmpty ||
-        lastName.isEmpty) {
+        lastName.isEmpty ||
+        age.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-              "Please fill in all fields.",
-              style: TextStyle(
-                fontSize: 14,
-                fontStyle: FontStyle.normal,
-                color: AppTheme.kBackgroundColor,
-                fontWeight: FontWeight.w600,
-                fontFamily: 'Helvetica Neue',
-              ),
+            "Please fill in all fields.",
+            style: TextStyle(
+              fontSize: 14,
+              fontStyle: FontStyle.normal,
+              color: AppTheme.kBackgroundColor,
+              fontWeight: FontWeight.w600,
+              fontFamily: 'Helvetica Neue',
+            ),
           ),
           backgroundColor: AppTheme.kErrorColor,
         ),
@@ -63,6 +88,8 @@ class _CleanersApplyState extends State<CleanersApply> {
 
     User? user = await registerWithEmailPassword(email, password);
     if (user != null) {
+      String? imageUrl = await uploadImage(selectedImage!);
+
       // Registration successful
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -76,13 +103,13 @@ class _CleanersApplyState extends State<CleanersApply> {
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Helvetica Neue',
               ),
-              ),
+            ),
             backgroundColor: AppTheme.kLightGreyColor3,
           ),
         );
       }
 
-      // Navigate to the sign-in screen
+      // Navigate to the sign-in cleaners screen
       if (mounted) {
         showDialog<void>(
           context: context,
@@ -93,11 +120,22 @@ class _CleanersApplyState extends State<CleanersApply> {
               ),
               elevation: 2,
               backgroundColor: AppTheme.kBackgroundColor,
-              child: SignInDialog(),
+              child: SignInCleanerDialog(),
             );
           },
         );
       }
+
+      await FirebaseFirestore.instance.collection('cleanersApply').add({
+        'first_name': firstName,
+        'last_name': lastName,
+        'email_address': email,
+        'age': age,
+        'photo': imageUrl,
+        'photoURL': photoURL,
+
+        'createdAt': FieldValue.serverTimestamp(), //optional
+      });
     } else {
       // Registration failed
       if (mounted) {
@@ -112,7 +150,7 @@ class _CleanersApplyState extends State<CleanersApply> {
                 fontWeight: FontWeight.w600,
                 fontFamily: 'Helvetica Neue',
               ),
-              ),
+            ),
             backgroundColor: AppTheme.kErrorColor,
           ),
         );
@@ -126,6 +164,8 @@ class _CleanersApplyState extends State<CleanersApply> {
     _passwordController.dispose();
     _firstNameController.dispose();
     _lastNameController.dispose();
+    _ageController.dispose();
+
     super.dispose();
   }
 
@@ -324,6 +364,79 @@ class _CleanersApplyState extends State<CleanersApply> {
                   child: Align(
                     alignment: Alignment.centerLeft,
                     child: Text(
+                      'Your age:',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontStyle: FontStyle.normal,
+                        color: AppTheme.kBlackColor,
+                        fontWeight: FontWeight.w700,
+                        fontFamily: 'Helvetica Neue',
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 5,
+                ),
+                SizedBox(
+                  height: 30,
+                  child: Padding(
+                    padding: const EdgeInsets.only(left: 12, right: 12),
+                    child: TextFormField(
+                      controller: _ageController,
+                      style: const TextStyle(
+                        fontFamily: 'Helvetica Neue',
+                        color: AppTheme.kBlackColor,
+                        fontSize: 13,
+                        fontWeight: FontWeight.w500,
+                      ),
+                      decoration: InputDecoration(
+                        border: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                          ),
+                        ),
+                        disabledBorder: OutlineInputBorder(
+                          borderRadius: BorderRadius.circular(5),
+                          borderSide: const BorderSide(
+                            color: AppTheme.kSecondaryGreyColor,
+                            width: 0.5,
+                          ),
+                        ),
+                        contentPadding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                        ),
+                        fillColor: AppTheme.kBackgroundColor,
+                        hintStyle: TextStyle(
+                          fontFamily: 'Helvetica Neue',
+                          color: AppTheme.kDullGreyColor,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
+                  ),
+                ),
+                const SizedBox(
+                  height: 15,
+                ),
+                const Padding(
+                  padding: EdgeInsets.only(left: 12),
+                  child: Align(
+                    alignment: Alignment.centerLeft,
+                    child: Text(
                       'Upload your photo:',
                       style: TextStyle(
                         fontSize: 14,
@@ -338,7 +451,14 @@ class _CleanersApplyState extends State<CleanersApply> {
                 const SizedBox(
                   height: 5,
                 ),
-                ImageUploadField(),
+                ImageUploadField(
+                  onImageSelected: (File? image) {
+                    setState(() {
+                      selectedImage = image;
+                    });
+                    debugPrint('Selected image path: ${image?.path}');
+                  },
+                ),
                 const Padding(
                   padding: EdgeInsets.only(left: 12),
                   child: Align(
