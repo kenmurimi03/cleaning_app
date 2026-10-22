@@ -62,7 +62,7 @@ class _CleanersHomePageState extends State<CleanersHomePage> {
 
                     return Card(
                       margin: const EdgeInsets.symmetric(
-                          horizontal: 16, vertical: 8),
+                          horizontal: 15, vertical: 8),
                       elevation: 3,
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
